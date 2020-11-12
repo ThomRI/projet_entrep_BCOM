@@ -1,0 +1,21 @@
+/* Main server for the REST API for Zeek retroaction */
+
+const fs = require('fs');
+const https = require('https');
+
+const express = require('express');
+const app = express();
+
+// Custom auth token check system
+const auth = require('./auth.js');
+
+app.get('/notify', (req, res) => {
+    if(!auth.checkToken(req, res)) return;
+});
+
+var httpsServer = https.createServer({
+    key:    fs.readFileSync('server.key'),
+    cert:   fs.readFileSync('server.crt')
+}, app).listen(8443, () => {
+    console.log("Server started on port 8443.");
+});
